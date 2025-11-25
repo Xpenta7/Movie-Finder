@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FEXOR</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600&family=Bai+Jamjuree:wght@400;600;700&family=Itim&family=Bungee&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            --bg-start: #ee0979; 
+            --bg-end: #ff6a00; 
+            --accent-primary: #7F5FFF; 
+            --accent-secondary: #00BFFF; 
+            --text-color: #1a1a1a; 
+            --card-color: rgba(255, 255, 255, 0.85); 
+            --glass-color: rgba(255, 255, 255, 0.6); 
+            --btn-gradient: linear-gradient(135deg, #ff6a00, #ee0979);
+        }
+
+        [data-theme="ocean"] {
+            --bg-start: #2193b0; --bg-end: #6dd5ed;
+            --accent-primary: #005c97; --btn-gradient: linear-gradient(135deg, #2193b0, #6dd5ed);
+        }
+        [data-theme="forest"] {
+            --bg-start: #11998e; --bg-end: #38ef7d;
+            --accent-primary: #0575e6; --btn-gradient: linear-gradient(135deg, #11998e, #38ef7d);
+        }
+        [data-theme="night"] {
+            --bg-start: #232526; --bg-end: #414345;
+            --text-color: #f1f1f1; --card-color: rgba(30, 30, 30, 0.85);
+            --glass-color: rgba(0, 0, 0, 0.6); --btn-gradient: linear-gradient(135deg, #232526, #414345);
+        }
+        [data-theme="purple"] {
+            --bg-start: #8E2DE2; --bg-end: #4A00E0;
+            --text-color: #ffffff; --card-color: rgba(255, 255, 255, 0.15);
+            --glass-color: rgba(0, 0, 0, 0.3); --btn-gradient: linear-gradient(135deg, #8E2DE2, #4A00E0);
+        }
+
+        /* Base Styles */
+        body {
+            font-family: 'Anuphan', sans-serif;
+            transition: background-image 0.5s ease, background-color 0.5s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+            color: var(--text-color);
+            background-attachment: fixed;
+        }
+
+        /* Font Classes */
+        .font-anuphan {
+            font-family: 'Anuphan', sans-serif;
+        }
+        .font-bai-jamjuree {
+            font-family: 'Bai Jamjuree', sans-serif;
+        }
+        .font-ibm-plex {
+            font-family: 'Itim', cursive;
+        }
+
+        .font-bungee { font-family: 'Bungee', cursive; }
+
+        /* App title styling: mix-blend to get contrasting/opposite look on glass */
+        .app-title { font-family: 'Bungee', cursive; font-size: 2rem;
+         line-height:1; color: #ffffff; }
+
+        
+        /* Glass Card */
+        .glass-card {
+            background-color: var(--card-color);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 900px;
+            margin: auto;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .btn-primary {
+            background: var(--btn-gradient);
+            color: white;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        
+        /* Dice Animation */
+        @keyframes roll {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(90deg); }
+            50% { transform: rotate(180deg); }
+            75% { transform: rotate(270deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .animate-roll {
+            animation: roll 0.6s linear infinite;
+        }
+
+        /* Film Reel Spin Animation */
+        @keyframes spin-reel {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .animate-spin-reel {
+            animation: spin-reel 2s linear infinite;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.4); }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .snap-x-mandatory { scroll-snap-type: x mandatory; }
+        .snap-center { scroll-snap-align: center; }
+        /* Contrast text for inputs & textareas */
+        .contrast-text { color: var(--text-color); }
+
+        /* Notices */
+        .notice-wrap { 
+            position: fixed; 
+            right: 12px; 
+            top: 100px; 
+            z-index: 60; 
+            display:flex; 
+            flex-direction:column; 
+            gap:10px; 
+            align-items:flex-end; 
+        }
+        .notice { 
+            background: #ffffff;
+            color: #333;
+            padding:10px 14px;
+            border-radius:12px;
+            transform: translateX(120%);
+            animation: slideIn 0.3s forwards;
+            max-width:280px;
+            font-size: 13px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            border: 1px solid rgba(0,0,0,0.08);
+            transition: opacity 0.3s ease, transform 0.3s ease, color 0.3s ease;
+        }
+        .notice.success { color: #16a34a; border-color: rgba(22,163,74,0.2); }
+        .notice.info { color: #0284c7; border-color: rgba(2,132,199,0.2); }
+        .notice.warn { color: #ea580c; border-color: rgba(234,88,12,0.2); }
+        .notice.fading { opacity: 0; transform: translateX(100%); }
+        .notice.move-up { animation: slideUp 0.3s forwards; }
+        @keyframes slideUp { from { transform: translateY(0); } to { transform: translateY(-12px); } }
+        @keyframes slideIn { 
+            to { transform: translateX(0); } 
+        }
+        .glass-button { 
+            background: rgba(255,255,255,0.12); 
+            backdrop-filter: blur(6px); 
+            padding:8px 12px; 
+            border-radius:12px; 
+            border:1px solid rgba(255,255,255,0.08);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        /* Login Button Styles */
+        .btn-google {
+            background-color: white;
+            color: #333;
+            border: 1px solid #ddd;
+            transition: all 0.2s;
+        }
+        .btn-google:hover {
+            background-color: #f8f8f8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .btn-guest {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: all 0.2s;
+        }
+        .btn-guest:hover {
+            background-color: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+<div id="root" class="w-full max-w-5xl flex flex-col items-center pb-10"></div>
+
+<script type="module">
+    // --- FIREBASE SETUP ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-analytics.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCejoYC6Yk1IX0fCFnHeQL-EDPRDNLApsY",
+        authDomain: "ob-fexor.firebaseapp.com",
+        projectId: "ob-fexor",
+        storageBucket: "ob-fexor.firebasestorage.app",
+        messagingSenderId: "268180164628",
+        appId: "1:268180164628:web:c154b10e2895a1ea779701",
+        measurementId: "G-MVDKZ67WMR"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Make services available globally for React
+    window.firebaseAuth = auth;
+    window.firebaseDb = db;
+    window.firebaseServices = { 
+        signInWithPopup, 
+        GoogleAuthProvider, 
+        signInAnonymously, 
+        onAuthStateChanged, // <--- Ensure this is here
+        signOut, 
+        collection, 
+        addDoc, 
+        query, 
+        where, 
+        getDocs,
+        updateDoc
+    };
+</script>
+
+<script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+    const { signInWithPopup, GoogleAuthProvider, signInAnonymously, signOut, collection, addDoc, query, where, getDocs } = window.firebaseServices;
+    const auth = window.firebaseAuth;
+    const db = window.firebaseDb;
+
+    // --- TRANSLATIONS (Thai / English) ---
+    const L10N = {
+        th: {
+            welcome_sub: 'มาหาหนังกันเถอะ',
+            username: 'Username',
+            username_placeholder: 'กรอกชื่อ Username ของคุณ',
+            api_label: 'Gemini API Key',
+            api_placeholder: 'วาง API Key ที่นี่...',
+            go_home: 'ไปหน้าแรกกันเลย',
+            save_usage_label: 'บันทึกข้อมูลการใช้งานไว้บนเครื่อง (Local)?',
+            back: '← กลับ',
+            search: 'ค้นหา',
+            randomize: 'สุ่มเลย!',
+            found_added: 'เพิ่ม "{title}" ในรายการแล้วจ้ะ!',
+            ignored: 'ปัดทิ้ง "{title}" แล้วจ้ะ',
+            backup_ok: 'Backup สร้างสำเร็จ',
+        },
+        en: {
+            welcome_sub: 'Where every click finds a flick',
+            username: 'Username',
+            username_placeholder: 'Type your username',
+            api_label: 'Gemini API Key',
+            api_placeholder: 'Paste API Key here...',
+            go_home: 'Go to Home',
+            save_usage_label: 'Save usage data locally?',
+            back: '← Back',
+            search: 'Search',
+            randomize: 'Surprise me!',
+            found_added: 'Added "{title}" to your list!',
+            ignored: 'Removed "{title}" from suggestions',
+            backup_ok: 'Backup created',
+        }
+    };
+
+    // Generic Confirm Modal (app-styled)
+    const ConfirmModal = ({ isOpen, message, onClose, onConfirm, title }) => {
+        if (!isOpen) return null;
+        return (
+            <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                <div className="glass-card max-w-md w-full relative">
+                    <button onClick={onClose} className="absolute top-4 right-4 p-2 hover:bg-black/10 rounded-full"><X size={20}/></button>
+                    <h3 className="text-xl font-bold mb-4 text-amber-600 flex items-center gap-2">{title || 'ยืนยันการกระทำ'}</h3>
+                    <p className="mb-4">{message}</p>
+                    <div className="flex gap-3">
+                        <button onClick={onClose} className="flex-1 py-3 rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-300 transition font-medium">ยกเลิก</button>
+                        <button onClick={() => { onConfirm(); onClose(); }} className="flex-1 py-3 rounded-xl bg-amber-500 text-white hover:bg-amber-600 transition font-medium">ใช่ ยืนยัน</button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    // --- App-level refs / helpers for cancelable searches & notices ---
+    const searchControllerRef = { current: null };
+
+    // --- ICON COMPONENTS ---
+    const IconBase = ({ size = 24, className = "", children, ...props }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+            {children}
+        </svg>
+    );
+
+    const Icons = {
+        Film: (props) => <IconBase {...props}><rect width="18" height="18" x="3" y="3" rx="2" /><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></IconBase>,
+        User: (props) => <IconBase {...props}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></IconBase>,
+        Key: (props) => <IconBase {...props}><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></IconBase>,
+        ChevronRight: (props) => <IconBase {...props}><path d="m9 18 6-6-6-6"/></IconBase>,
+        Download: (props) => <IconBase {...props}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></IconBase>,
+        Upload: (props) => <IconBase {...props}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></IconBase>,
+        RotateCcw: (props) => <IconBase {...props}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></IconBase>,
+        Clapperboard: (props) => <IconBase {...props}><path d="M20.2 6 3 11l-.9-2.4c-.5-1.1.2-2.4 1.3-2.9l3.2-1.4H9l4.1 3.7a2.3 2.3 0 1 1-3.3 3.3L3 11"/><path d="m22 11-2-5-10.9 4.9"/><rect width="20" height="12" x="2" y="10" rx="2"/></IconBase>,
+        Save: (props) => <IconBase {...props}><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></IconBase>,
+        Settings: (props) => <IconBase {...props}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></IconBase>,
+        Trash2: (props) => <IconBase {...props}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></IconBase>,
+        Search: (props) => <IconBase {...props}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></IconBase>,
+        X: (props) => <IconBase {...props}><path d="M18 6 6 18"/><path d="m6 6 18 12"/></IconBase>,
+        Globe: (props) => <IconBase {...props}><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></IconBase>,
+        Tv: (props) => <IconBase {...props}><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></IconBase>,
+        Eye: (props) => <IconBase {...props}><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></IconBase>,
+        EyeOff: (props) => <IconBase {...props}><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></IconBase>,
+        ThumbsUp: (props) => <IconBase {...props}><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"/></IconBase>,
+        ThumbsDown: (props) => <IconBase {...props}><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22h0a3.13 3.13 0 0 1-3-3.88Z"/></IconBase>,
+        FileQuestion: (props) => <IconBase {...props}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M12 13v4.3"/><path d="M12 10v.3"/></IconBase>,
+        RefreshCw: (props) => <IconBase {...props}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></IconBase>,
+        Filter: (props) => <IconBase {...props}><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></IconBase>,
+        ExternalLink: (props) => <IconBase {...props}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></IconBase>,
+        Dice: (props) => <IconBase {...props}><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M16 8h.01"/><path d="M8 8h.01"/><path d="M8 16h.01"/><path d="M16 16h.01"/><path d="M12 12h.01"/></IconBase>,
+        Heart: (props) => <IconBase {...props}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></IconBase>,
+        Ban: (props) => <IconBase {...props}><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></IconBase>,
+        Calendar: (props) => <IconBase {...props}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></IconBase>,
+        Mic: (props) => <IconBase {...props}><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></IconBase>,
+        LogOut: (props) => <IconBase {...props}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></IconBase>,
+        Google: (props) => <IconBase {...props}><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-16.8c-2.4 0-4.2 1.8-4.2 4.2s1.8 4.2 4.2 4.2c1.7 0 3.2-.9 3.8-2.3H11v-3.4h7.5c.1.5.2 1.1.2 1.7 0 4-2.8 6.9-6.7 6.9z" fill="currentColor"/></IconBase> 
+    };
+
+    const { Save, Search, RotateCcw, Settings, Download, Upload, Film, Clapperboard, User, Key, Trash2, ChevronRight, X, Globe, Tv, Eye, EyeOff, ThumbsUp, ThumbsDown, FileQuestion, RefreshCw, Filter, ExternalLink, Dice, Heart, Ban, Calendar, Mic, LogOut, Google } = Icons;
+
+    // --- DATA ---
+    const GENRES = ["แอคชั่น", "สยองขวัญ", "ตลก", "โรแมนติก", "ดราม่า", "ไซไฟ", "แฟนตาซี", "สืบสวน", "ระทึกขวัญ", "สารคดี"];
+    const MEDIA_TYPES = ["ภาพยนตร์", "ซีรีส์", "อนิเมชั่น", "อนิเมะ", "การ์ตูน"];
+    const COUNTRIES = ["ไม่ระบุ", "เกาหลี", "ไทย", "ญี่ปุ่น", "อเมริกา", "จีน", "ยุโรป"];
+    const STREAMING_PLATFORMS = [
+        { id: 'Netflix', color: 'bg-red-600 text-white' },
+        { id: 'Disney+', color: 'bg-blue-900 text-white' },
+        { id: 'HBO Max', color: 'bg-purple-900 text-white' },
+        { id: 'iQIYI', color: 'bg-green-600 text-white' },
+        { id: 'Viu', color: 'bg-yellow-400 text-black' },
+        { id: 'Bilibili', color: 'bg-pink-400 text-white' },
+        { id: 'Mono Max', color: 'bg-red-500 text-white' },
+    ];
+    
+    const THEMES = [
+        { id: 'default', name: 'Sunset Pulse', colors: ['#ee0979', '#ff6a00'] },
+        { id: 'ocean', name: 'Deep Ocean', colors: ['#2193b0', '#6dd5ed'] },
+        { id: 'forest', name: 'Fresh Nature', colors: ['#11998e', '#38ef7d'] },
+        { id: 'night', name: 'Midnight', colors: ['#232526', '#414345'] },
+        { id: 'purple', name: 'Royal Vibes', colors: ['#8E2DE2', '#4A00E0'] },
+    ];
+
+    const FONTS = [
+        { id: 'anuphan', name: 'Anuphan', class: 'font-anuphan', example: 'ตัวอย่างฟอนต์ Anuphan' },
+        { id: 'bai-jamjuree', name: 'Bai Jamjuree', class: 'font-bai-jamjuree', example: 'ตัวอย่างฟอนต์ Bai Jamjuree' },
+        { id: 'ibm-plex', name: 'Itim Thai', class: 'font-ibm-plex', example: 'ตัวอย่างฟอนต์ Itim' }
+    ];
+
+    // --- HELPER ---
+    const openGoogleSearch = (title, year) => {
+        const query = `${title} ${year || ''}`;
+        window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+    };
+
+    // --- COMPONENTS ---
+
+    // Login Screen Component
+    const LoginScreen = ({ onLoginGoogle, onLoginGuest, loading }) => {
+        return (
+            <div className="glass-card animate-fade-in text-center max-w-sm mt-10 relative flex flex-col items-center">
+                 <div className="p-6 rounded-full bg-white/10 inline-block mb-4 relative">
+                    <div className="app-title">FEXOR</div>
+                </div>
+                <h2 className="text-xl font-bold mb-2">เข้าสู่ระบบ</h2>
+                <p className="mb-6 opacity-80 text-sm">ค้นหาหนังที่ใช่ บันทึกเรื่องที่ชอบ</p>
+                
+                <div className="w-full space-y-3">
+                    <button 
+                        onClick={onLoginGoogle} 
+                        disabled={loading}
+                        className="btn-google w-full py-3 rounded-xl font-bold flex items-center justify-center gap-3 shadow-sm hover:shadow-md"
+                    >
+                         <svg className="w-5 h-5" viewBox="0 0 24 24">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                        </svg>
+                        Login with Google
+                    </button>
+                    
+                    <button 
+                        onClick={onLoginGuest}
+                        disabled={loading}
+                        className="btn-google w-full py-3 rounded-xl font-bold flex items-center justify-center gap-3"
+                    >
+                        <User size={20}/>
+                        เข้าใช้งานแบบ Guest
+                    </button>
+                </div>
+                {loading && <div className="mt-4 text-sm opacity-70 animate-pulse">กำลังเชื่อมต่อ...</div>}
+            </div>
+        );
+    };
+
+    // Delete Confirmation Modal
+    const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
+        const [shouldDeleteData, setShouldDeleteData] = useState(false);
+        if (!isOpen) return null;
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in p-4">
+                <div className="glass-card max-w-md w-full relative">
+                    <button onClick={onClose} className="absolute top-4 right-4 p-2 hover:bg-black/10 rounded-full"><X size={20}/></button>
+                    <h3 className="text-xl font-bold mb-4 text-red-600 flex items-center gap-2"><LogOut size={24} /> ยืนยันการออกจากระบบ</h3>
+                    <p className="mb-4 text-sm opacity-80">คุณต้องการออกจากระบบหรือไม่?</p>
+                    <div className="mb-4 p-3 bg-white/30 rounded-xl">
+                        <label className="flex items-start gap-2 cursor-pointer">
+                            <input type="checkbox" checked={shouldDeleteData} onChange={(e) => setShouldDeleteData(e.target.checked)} className="mt-0.5 cursor-pointer" />
+                            <div className="text-sm">
+                                <div className="font-bold">ลบข้อมูลการใช้งาน</div>
+                                <div className="text-xs opacity-80">หากไม่เลือก จะเก็บข้อมูลไว้สำหรับการใช้งานครั้งต่อไป</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div className="flex gap-3">
+                        <button onClick={onClose} className="flex-1 py-3 rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-300 transition font-medium">ยกเลิก</button>
+                        <button onClick={() => { onConfirm(shouldDeleteData); onClose(); }} className="flex-1 py-3 rounded-xl bg-red-500 text-white hover:bg-red-600 transition font-medium">ออกจากระบบ</button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    // Settings Modal
+    const SettingsModal = ({ isOpen, onClose, userData, updateUserData, onLogout, onFactoryReset, handleBackup, onRestore }) => {
+        if (!isOpen) return null;
+        const fileInputRef = useRef(null);
+        const [isChangingName, setIsChangingName] = useState(false);
+        const [newName, setNewName] = useState(userData.username || '');
+        const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+        const [apiDraft, setApiDraft] = useState(userData.apiKey || '');
+        const [apiVisible, setApiVisible] = useState(false);
+
+        const handleNameChange = () => {
+            if (newName.trim()) {
+                updateUserData({ username: newName.trim() });
+                setIsChangingName(false);
+            }
+        };
+
+        const handleSaveAndClose = () => {
+            updateUserData({ apiKey: apiDraft });
+            onClose();
+        };
+
+        return (
+            <>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in p-4">
+                    <div className="glass-card max-w-sm w-full relative text-center max-h-[90vh] overflow-y-auto" style={{ transform: 'scale(0.8)', transformOrigin: 'center' }}>
+                        <button onClick={onClose} className="absolute top-4 right-4 p-2 hover:bg-black/10 rounded-full"><X size={20}/></button>
+                        <h2 className="text-2xl font-bold mb-6 font-bai-jamjuree flex items-center justify-center gap-2"><Settings/> ตั้งค่า & จัดการข้อมูล</h2>
+                        
+                        {/* Personal Info */}
+                        <div className="mb-6 p-4 bg-white/30 rounded-xl text-left">
+                            <h3 className="text-lg font-bold mb-3 flex items-center gap-2"><User size={18} /> ข้อมูลส่วนตัว</h3>
+                            {!isChangingName ? (
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="font-medium">Username:</p>
+                                        <p className="text-xl font-bold">{userData.username || 'ยังไม่ได้ตั้ง Username'}</p>
+                                        {userData.googleEmail && <p className="text-sm opacity-80 mt-1">{userData.googleEmail}</p>}
+                                    </div>
+                                    <button 
+                                        onClick={() => setIsChangingName(true)}
+                                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                                    >
+                                        เปลี่ยน
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    <label className="block text-sm font-bold">ชื่อใหม่</label>
+                                    <input 
+                                        type="text"
+                                        value={newName}
+                                        onChange={(e) => setNewName(e.target.value)}
+                                        className="w-full p-3 rounded-xl bg-white/50 border-none focus:ring-2 focus:ring-blue-400 outline-none contrast-text"
+                                        placeholder="กรอกชื่อใหม่..."
+                                    />
+                                    <div className="flex gap-2">
+                                        <button 
+                                            onClick={handleNameChange}
+                                            className="flex-1 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+                                        >
+                                            บันทึก
+                                        </button>
+                                        <button 
+                                            onClick={() => {
+                                                setIsChangingName(false);
+                                                setNewName(userData.username || '');
+                                            }}
+                                            className="flex-1 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
+                                        >
+                                            ยกเลิก
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* API Key Editor */}
+                        <div className="mb-6 p-4 bg-white/30 rounded-xl text-left">
+                            <h3 className="text-lg font-bold mb-3 flex items-center gap-2"><Key size={18} /> API Key</h3>
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2">
+                                    <input 
+                                        type={apiVisible ? 'text' : 'password'} 
+                                        value={apiDraft} 
+                                        onChange={(e) => setApiDraft(e.target.value)} 
+                                        className="flex-1 p-3 rounded-xl bg-white/50 border-none focus:ring-2 focus:ring-yellow-400 outline-none contrast-text" 
+                                        placeholder="วาง API Key ที่นี่..." 
+                                    />
+                                    <button onClick={() => setApiVisible(v => !v)} className="p-2 rounded-lg glass-button">{apiVisible ? <Eye size={16}/> : <EyeOff size={16}/>}</button>
+                                </div>
+                                <button 
+                                    onClick={handleSaveAndClose} 
+                                    className="w-full py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition font-medium"
+                                >
+                                    บันทึก API ใหม่
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Font Selection */}
+                        <div className="mb-6">
+                            <label className="block text-sm font-bold mb-2 opacity-70">เลือกฟอนต์</label>
+                            <div className="flex gap-2 justify-center">
+                                {FONTS.map(font => (
+                                    <button 
+                                        key={font.id}
+                                        onClick={() => updateUserData({ fontFamily: font.id })}
+                                        className={`p-2 rounded-xl transition ${userData.fontFamily === font.id ? 'bg-purple-500 text-white' : 'bg-white/30 hover:bg-white/50'}`}
+                                    >
+                                        <div className={font.class}>
+                                            <div className="font-bold text-sm">{font.name}</div>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Dashboard Settings */}
+                        <div className="mb-6 p-4 bg-white/30 rounded-xl text-left">
+                            <label className="block text-sm font-bold mb-2 opacity-90">จำนวนหนังสูงสุดในหน้าแรก: {userData.dashboardLimit || 20} เรื่อง</label>
+                            <input 
+                                type="range" 
+                                min="2" 
+                                max="50" 
+                                step="2"
+                                value={userData.dashboardLimit || 20} 
+                                onChange={(e) => updateUserData({ dashboardLimit: parseInt(e.target.value) })}
+                                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-pink-500"
+                            />
+                            <div className="flex justify-between text-xs opacity-60 mt-1">
+                                <span>2</span>
+                                <span>50</span>
+                            </div>
+                        </div>
+
+                        {/* Theme */}
+                        <div className="mb-6">
+                            <label className="block text-sm font-bold mb-2 opacity-70">เลือกธีมสี</label>
+                            <div className="flex gap-3 justify-center flex-wrap">
+                                {THEMES.map(t => (
+                                    <button key={t.id} onClick={() => updateUserData({ theme: t.id })}
+                                        className={`w-10 h-10 rounded-full shadow-md border-2 transition-transform hover:scale-110 ${userData.theme === t.id ? 'border-white scale-110 ring-2' : 'border-transparent'}`}
+                                        style={{ background: `linear-gradient(135deg, ${t.colors[0]}, ${t.colors[1]})` }} />
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Data Management */}
+                        <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-3">
+                                <button onClick={handleBackup} className="w-full py-3 rounded-xl bg-white/30 hover:bg-white/50 transition flex items-center justify-center gap-2 font-medium"><Download size={18}/> Backup</button>
+                                <button onClick={() => fileInputRef.current.click()} className="w-full py-3 rounded-xl bg-white/30 hover:bg-white/50 transition flex items-center justify-center gap-2 font-medium"><Upload size={18}/> Restore</button>
+                            </div>
+                            <input type="file" ref={fileInputRef} className="hidden" accept=".json" onChange={onRestore} />
+                            
+                            <div className="border-t border-black/10 dark:border-white/10 my-4 pt-4 grid grid-cols-2 gap-3">
+                                <button onClick={() => setIsDeleteConfirmOpen(true)} className="py-3 rounded-xl bg-red-500/20 text-red-700 dark:text-red-200 hover:bg-red-500/40 transition flex items-center justify-center gap-2 font-medium"><LogOut size={18}/> Sign Out</button>
+                                <button onClick={onClose} className="py-3 rounded-xl bg-green-500/20 text-green-700 dark:text-green-200 hover:bg-green-500/40 transition flex items-center justify-center gap-2 font-medium"><Save size={18}/> ปิด</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <DeleteConfirmationModal 
+                    isOpen={isDeleteConfirmOpen}
+                    onClose={() => setIsDeleteConfirmOpen(false)}
+                    onConfirm={onLogout}
+                />
+            </>
+        );
+    };
+
+    // Dashboard (Custom 2-Row Grid that fills row 1 first)
+    const Dashboard = ({ savedMovies, limit, onStartSearch, username }) => {
+        const displayMovies = savedMovies.slice(0, limit);
+        const half = Math.ceil(displayMovies.length / 2);
+
+        return (
+            <div className="w-full max-w-5xl animate-fade-in">
+                {displayMovies.length > 0 && (
+                    <div className="mb-8">
+                        <h3 className="text-xl font-bold mb-4 px-4 flex items-center gap-2 text-white shadow-black drop-shadow-md"><Film /> หนังที่ {username || 'คุณ'} เก็บไว้ล่าสุด</h3>
+                        
+                        <div className="overflow-x-auto pb-6 px-4 scrollbar-hide">
+                            <div className="flex gap-4">
+                                {Array.from({ length: half }).map((_, i) => {
+                                    const topMovie = displayMovies[i];
+                                    const bottomMovie = displayMovies[i + half];
+                                    return (
+                                        <div key={i} className="flex flex-col gap-4 shrink-0">
+                                            {topMovie && <MovieThumbnail movie={topMovie} />}
+                                            {bottomMovie && <MovieThumbnail movie={bottomMovie} />}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                )}
+                
+                <div className="text-center mt-4">
+                    <button onClick={onStartSearch} className="btn-primary px-10 py-4 rounded-full font-bold text-xl shadow-xl flex items-center justify-center gap-3 mx-auto animate-bounce">
+                        <Search size={28} /> เริ่มค้นหาเลยจ้ะ
+                    </button>
+                </div>
+            </div>
+        );
+    };
+
+    const MovieThumbnail = ({ movie }) => (
+        <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg transform hover:scale-95 transition-all duration-300 relative group h-64 w-48">
+            <div className="w-full h-full cursor-pointer relative" onClick={() => openGoogleSearch(movie.title, movie.year)} title="ค้นหาใน Google">
+                <img src={movie.poster || `https://via.placeholder.com/200x300?text=${encodeURIComponent(movie.title)}`} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent p-3 flex flex-col justify-end">
+                    <h4 className="text-white font-bold truncate text-sm">{movie.title}</h4>
+                    <span className="text-gray-300 text-xs">{movie.year}</span>
+                </div>
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition bg-white/80 text-black rounded-full p-1">
+                    <ExternalLink size={12}/>
+                </div>
+                {movie.streaming && (
+                    <div className="absolute top-2 left-2">
+                        <span className="bg-blue-500 text-white text-[10px] px-2 py-0.5 rounded-full shadow-md">{movie.streaming}</span>
+                    </div>
+                )}
+            </div>
+            <div className="absolute bottom-2 left-2 flex gap-1">
+                {movie.watched && <span className="bg-green-500 text-white text-[10px] px-2 py-0.5 rounded-full shadow-md">ดูแล้ว</span>}
+                {movie.isWishlist && <span className="bg-pink-500 text-white text-[10px] px-2 py-0.5 rounded-full shadow-md">อยากดู</span>}
+                {!movie.watched && !movie.isWishlist && <span className="bg-gray-500 text-white text-[10px] px-2 py-0.5 rounded-full shadow-md">ยังไม่ดู</span>}
+            </div>
+        </div>
+    );
+
+    const App = () => {
+        // --- FIREBASE AUTH STATE ---
+        const [firebaseUser, setFirebaseUser] = useState(null);
+        const [authLoading, setAuthLoading] = useState(true);
+
+        useEffect(() => {
+            const unsubscribe = window.firebaseServices.onAuthStateChanged(window.firebaseAuth, (user) => {
+                setFirebaseUser(user);
+                setAuthLoading(false);
+            });
+            return () => unsubscribe();
+        }, []);
+
+        // --- STATE ---
+        const [userData, setUserData] = useState(() => {
+            const saved = localStorage.getItem('jinny_movie_data_v6');
+            const defaults = { username: '', apiKey: '', theme: 'default', dashboardLimit: 20, savedMovies: [], notFoundMovies: [], ignoredMovies: [], fontFamily: 'anuphan', googleEmail: '', lang: 'th', saveUsage: true };
+            if (!saved) return defaults;
+            try {
+                const parsed = JSON.parse(saved);
+                return { ...defaults, ...parsed, username: parsed.username || parsed.nickname || '' };
+            } catch (e) {
+                return defaults;
+            }
+        });
+        
+        const [view, setView] = useState(() => {
+            const saved = localStorage.getItem('jinny_movie_data_v6');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (parsed.apiKey) return 'dashboard';
+                } catch (e) {}
+            }
+            return 'welcome';
+        }); 
+        const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+        
+        // Search State
+        const [loading, setLoading] = useState(false);
+        const [promptText, setPromptText] = useState('');
+        const [searchHistory, setSearchHistory] = useState([]); 
+        const [results, setResults] = useState([]);
+        const searchControllerRef = useRef(null);
+        const [randomPrompt, setRandomPrompt] = useState('');
+        const [notices, setNotices] = useState([]); // {id, text, type, fading}
+
+        const pushNotice = (text, type = 'info') => {
+            const id = Date.now() + Math.floor(Math.random()*1000);
+            setNotices(prev => [...prev, { id, text, type, fading: false }]);
+            setTimeout(() => {
+                setNotices(prev => prev.map((n, idx) => idx === 0 ? { ...n, fading: true } : n));
+                setTimeout(() => setNotices(prev => prev.slice(1)), 380);
+            }, 4800);
+        };
+
+        // Confirm modal state helper
+        const [confirmState, setConfirmState] = useState({ open: false, message: '', onConfirm: null, title: '' });
+        const showConfirm = (message, onConfirm, title='') => setConfirmState({ open: true, message, onConfirm, title });
+        
+        // Filters
+        const [selectedGenres, setSelectedGenres] = useState([]);
+        const [selectedMediaType, setSelectedMediaType] = useState('');
+        const [selectedCountry, setSelectedCountry] = useState('');
+        const [selectedStreaming, setSelectedStreaming] = useState([]);
+        const [selectedAudio, setSelectedAudio] = useState([]);
+        const [yearRange, setYearRange] = useState({ start: '', end: '' });
+
+        // Filters - Saved View
+        const [savedFilters, setSavedFilters] = useState([]);
+
+        // Load user data from Firestore if Google login
+        useEffect(() => {
+            if (firebaseUser && !firebaseUser.isAnonymous && !firebaseUser.uid.startsWith('offline-')) {
+                const loadUserDataFromFirestore = async () => {
+                    try {
+                        const userDocRef = window.firebaseServices.collection(window.firebaseDb, "users");
+                        const q = window.firebaseServices.query(userDocRef, window.firebaseServices.where("uid", "==", firebaseUser.uid));
+                        const querySnapshot = await window.firebaseServices.getDocs(q);
+                        if (!querySnapshot.empty) {
+                            const userData_firestore = querySnapshot.docs[0].data();
+                            setUserData(prev => ({
+                                ...prev,
+                                username: userData_firestore.username || prev.username,
+                                theme: userData_firestore.theme || prev.theme,
+                                fontFamily: userData_firestore.fontFamily || prev.fontFamily,
+                                dashboardLimit: userData_firestore.dashboardLimit || prev.dashboardLimit,
+                                googleEmail: firebaseUser.email,
+                                lang: userData_firestore.lang || prev.lang
+                            }));
+                        } else {
+                            // First time Google login - force setup
+                            setUserData(prev => ({
+                                ...prev,
+                                googleEmail: firebaseUser.email,
+                                apiKey: '',
+                                username: ''
+                            }));
+                            setView('welcome');
+                        }
+                    } catch (e) {
+                        console.error("Failed to load user data from Firestore", e);
+                    }
+                };
+                loadUserDataFromFirestore();
+            }
+        }, [firebaseUser]);
+
+        useEffect(() => {
+            document.documentElement.setAttribute('data-theme', userData.theme);
+            const fontClass = FONTS.find(f => f.id === userData.fontFamily)?.class || 'font-anuphan';
+            document.body.className = fontClass;
+            
+            // Save data persistence logic
+            try {
+                // If Guest/Offline or saveUsage is enabled, save to localStorage
+                if (!firebaseUser || firebaseUser.isAnonymous || firebaseUser.uid.startsWith('offline-') || userData.saveUsage) {
+                    localStorage.setItem('jinny_movie_data_v6', JSON.stringify(userData));
+                }
+                
+                // If Google login, save settings to Firestore (not movies/lists)
+                if (firebaseUser && !firebaseUser.isAnonymous && !firebaseUser.uid.startsWith('offline-')) {
+                    const saveSettingsToFirestore = async () => {
+                        try {
+                            const userDocRef = window.firebaseServices.collection(window.firebaseDb, "users");
+                            const q = window.firebaseServices.query(userDocRef, window.firebaseServices.where("uid", "==", firebaseUser.uid));
+                            const querySnapshot = await window.firebaseServices.getDocs(q);
+                            const settingsData = {
+                                uid: firebaseUser.uid,
+                                email: firebaseUser.email,
+                                username: userData.username,
+                                theme: userData.theme,
+                                fontFamily: userData.fontFamily,
+                                dashboardLimit: userData.dashboardLimit,
+                                lang: userData.lang,
+                                lastUpdated: new Date()
+                            };
+                            if (!querySnapshot.empty) {
+                                await window.firebaseServices.updateDoc(querySnapshot.docs[0].ref, settingsData);
+                            } else {
+                                await window.firebaseServices.addDoc(userDocRef, settingsData);
+                            }
+                        } catch(e) { console.error("Failed to save settings to Firestore", e); }
+                    };
+                    saveSettingsToFirestore();
+                }
+            } catch(e) { console.error("Data persistence error", e); }
+        }, [userData, firebaseUser]);
+
+        const updateUserData = (newData) => setUserData(prev => ({ ...prev, ...newData }));
+
+        // --- AUTH HANDLERS ---
+        const handleLoginGoogle = async () => {
+            try {
+                setLoading(true);
+                const provider = new window.firebaseServices.GoogleAuthProvider();
+                const result = await window.firebaseServices.signInWithPopup(window.firebaseAuth, provider);
+                pushNotice(`ยินดีต้อนรับ ${result.user.displayName}`, 'success');
+                if (!userData.username) {
+                    updateUserData({ username: result.user.displayName, googleEmail: result.user.email, apiKey: '' });
+                    setView('welcome');
+                } else {
+                    setView('dashboard');
+                }
+            } catch (error) {
+                console.error(error);
+                if (error.code === 'auth/unauthorized-domain' || error.code === 'auth/admin-restricted-operation' || error.code === 'auth/operation-not-allowed') {
+                    setFirebaseUser({ uid: 'offline-user-' + Date.now(), isAnonymous: false, displayName: 'Offline User', email: 'offline@demo.com' });
+                } else {
+                    pushNotice('เข้าสู่ระบบไม่สำเร็จ ลองใหม่อีกครั้งนะ', 'warn');
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        const handleLoginGuest = async () => {
+            try {
+                setLoading(true);
+                await window.firebaseServices.signInAnonymously(window.firebaseAuth);
+                pushNotice('เข้าใช้งานแบบ Guest แล้วจ้า', 'success');
+            } catch (error) {
+                console.error(error);
+                // Fallback for unauthorized domain errors common in previews
+                if (error.code === 'auth/unauthorized-domain' || error.code === 'auth/admin-restricted-operation' || error.code === 'auth/operation-not-allowed') {
+                    setFirebaseUser({ uid: 'offline-guest-' + Date.now(), isAnonymous: true, displayName: 'Guest (Offline)' });
+                    pushNotice('เข้าใช้งานแบบ Guest แล้วจ้า', 'success');
+                } else {
+                    pushNotice('มีปัญหาในการเข้าใช้งานแบบ Guest', 'warn');
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        const handleLogout = async () => {
+            try {
+                if (firebaseUser && firebaseUser.uid.startsWith('offline-')) {
+                    setFirebaseUser(null);
+                } else {
+                    await window.firebaseServices.signOut(window.firebaseAuth);
+                }
+                setView('welcome');
+                pushNotice('ออกจากระบบเรียบร้อย', 'success');
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        // --- API LOGIC (Updated to use Firestore if needed in future) ---
+        const saveMovieToFirestore = async (movie, isWishlist) => {
+             if (!firebaseUser || firebaseUser.uid.startsWith('offline-')) return; // Skip firestore if offline mode
+             try {
+                await window.firebaseServices.addDoc(window.firebaseServices.collection(window.firebaseDb, "saved_movies"), {
+                    user_id: firebaseUser.uid,
+                    title: movie.title,
+                    year: movie.year,
+                    description: movie.description,
+                    poster: movie.poster,
+                    movie_id: movie.id, 
+                    savedAt: new Date(),
+                    watched: false,
+                    rating: null,
+                    isWishlist: isWishlist
+                });
+             } catch(e) { console.error("Firestore save error", e); }
+        };
+
+        const cancelSearch = () => {
+            try {
+                if (searchControllerRef.current) {
+                    searchControllerRef.current.abort();
+                    searchControllerRef.current = null;
+                }
+            } catch(e){}
+            setLoading(false);
+        };
+
+        const searchMovies = async (isRefinement = false) => {
+            if (!userData.apiKey) return;
+            if (!promptText.trim() && view === 'search' && !isRefinement) return;
+
+            setLoading(true);
+            if (searchControllerRef.current) {
+                try { searchControllerRef.current.abort(); } catch(e){}
+                searchControllerRef.current = null;
+            }
+            const controller = new AbortController();
+            searchControllerRef.current = controller;
+
+            let currentHistory = [...searchHistory];
+            if (promptText.trim()) {
+                currentHistory.push(promptText.trim());
+                setSearchHistory(currentHistory);
+            }
+
+            const contextText = view === 'randomizer' 
+                ? `User wants a random suggestion (What to watch today?). Prompt: ${randomPrompt || ''}` 
+                : currentHistory.join(' ...เพิ่มเติม... ');
+
+            const ignoredTitles = userData.ignoredMovies ? userData.ignoredMovies.map(m => m.title).join(', ') : '';
+            const streamingContext = selectedStreaming.length > 0 ? `MUST be available on: ${selectedStreaming.join(', ')}` : "Any streaming platform";
+            
+            const audioContext = selectedAudio.length > 0 ? `MUST have ${selectedAudio.join(' AND ')}` : "Any audio/sub";
+            const yearContext = (yearRange.start || yearRange.end) ? `Release Year between ${yearRange.start || 'Any'} and ${yearRange.end || 'Any'}` : "Any Release Year";
+
+            const systemInstruction = `
+                You are a friendly movie expert.
+                User: "${userData.username}".
+                Task: Identify 3 media items matching user description.
+                Constraints: 
+                - Genres: ${selectedGenres.join(', ') || 'Any'}
+                - Type: ${selectedMediaType || 'Any'}
+                - Country: ${selectedCountry || 'Any'}
+                - Streaming: ${streamingContext}
+                - Audio/Sub: ${audioContext}
+                - Year: ${yearContext}
+                - DO NOT Suggest these (Ignored): ${ignoredTitles}
+                Output: VALID JSON ARRAY ONLY. No chat text.
+                Format: [{"title": "Title", "year": "YYYY", "description": "Short summary in Thai", "poster_query": "Title Year poster", "streaming": "Platform"}]
+            `;
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${userData.apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    signal: controller.signal,
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: `Context: ${contextText}. Suggest 3 matches.` }] }],
+                        systemInstruction: { parts: [{ text: systemInstruction }] }
+                    })
+                });
+
+                const data = await response.json();
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "[]";
+                let cleanJson = text.replace(/```json|```/g, '').trim();
+                if(cleanJson.includes('[')) cleanJson = cleanJson.substring(cleanJson.indexOf('['));
+                if(cleanJson.includes(']')) cleanJson = cleanJson.substring(0, cleanJson.lastIndexOf(']') + 1);
+
+                let movies = JSON.parse(cleanJson);
+
+                const moviesWithImages = movies.map(m => ({
+                    ...m,
+                    poster: `https://tse2.mm.bing.net/th?q=${encodeURIComponent(m.poster_query)}&w=300&h=450&c=7&rs=1`
+                }));
+
+                setResults(moviesWithImages);
+                if(view === 'search') setPromptText('');
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log('Search aborted');
+                } else {
+                    console.error(error);
+                    pushNotice("เรานี่งงนิดหน่อยจ้ะ ลองกดค้นหาใหม่อีกรอบนะ!", 'warn');
+                }
+            } finally {
+                setLoading(false);
+                searchControllerRef.current = null;
+            }
+        };
+
+        // --- HANDLERS ---
+        const handleFoundIt = (movie, isWishlist = false) => {
+            const newMovie = { 
+                ...movie, 
+                id: Date.now(), 
+                savedAt: new Date().toISOString(),
+                watched: false,
+                rating: null,
+                isWishlist: isWishlist
+            };
+            
+            // Save locally
+            updateUserData({ savedMovies: [newMovie, ...userData.savedMovies] });
+            
+            // Save to Firestore (Sync)
+            saveMovieToFirestore(newMovie, isWishlist);
+
+            pushNotice(isWishlist ? `เพิ่ม "${movie.title}" ในรายการอยากดูแล้วจ้ะ!` : `🎉เย้! เจอแล้ว - "${movie.title}"`);
+            
+            if(view === 'randomizer') {
+                setResults(prev => prev.filter(m => m.title !== movie.title));
+            } else {
+                setResults([]);
+                setSearchHistory([]);
+                setPromptText('');
+            }
+        };
+
+        const handleIgnore = (movie) => {
+            const newIgnored = { ...movie, id: Date.now(), date: new Date().toISOString() };
+            updateUserData({ ignoredMovies: [...(userData.ignoredMovies || []), newIgnored] });
+            setResults(prev => prev.filter(m => m.title !== movie.title));
+            pushNotice(`ปัดทิ้ง "${movie.title}" แล้วจ้ะ`);
+        };
+
+        const handleRemoveIgnored = (id) => {
+            updateUserData({ ignoredMovies: userData.ignoredMovies.filter(m => m.id !== id) });
+        };
+
+        const handleNewSearch = () => {
+            if (searchHistory.length > 0) {
+                const notFoundItem = {
+                    id: Date.now(),
+                    descriptions: searchHistory,
+                    genres: selectedGenres,
+                    mediaType: selectedMediaType,
+                    country: selectedCountry,
+                    date: new Date().toLocaleDateString('th-TH')
+                };
+                updateUserData({ notFoundMovies: [notFoundItem, ...userData.notFoundMovies] });
+                pushNotice('เก็บข้อมูลที่หาไม่เจอไว้ให้แล้วน้า 😊', 'success');
+            }
+            setSearchHistory([]);
+            setResults([]);
+            setPromptText('');
+        };
+
+        const handleLoadNotFound = (item) => {
+            setSearchHistory(item.descriptions);
+            setSelectedGenres(item.genres || []);
+            setSelectedMediaType(item.mediaType || '');
+            setSelectedCountry(item.country || '');
+            setView('search');
+        };
+
+        const toggleWatched = (id) => {
+            const newSaved = userData.savedMovies.map(m => m.id === id ? { ...m, watched: !m.watched, rating: null } : m);
+            updateUserData({ savedMovies: newSaved });
+        };
+
+        const rateMovie = (id, rating) => {
+            const newSaved = userData.savedMovies.map(m => m.id === id ? { ...m, rating: m.rating === rating ? null : rating } : m);
+            updateUserData({ savedMovies: newSaved });
+        };
+
+        const toggleSavedFilter = (filter) => {
+            setSavedFilters(prev => prev.includes(filter) ? prev.filter(f => f !== filter) : [...prev, filter]);
+        };
+
+        // --- RENDER LOGIC ---
+        
+        // 1. Loading State
+        if (authLoading) {
+            return (
+                <div className="flex h-screen items-center justify-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+                </div>
+            );
+        }
+
+        // 2. Login View (If not authenticated)
+        if (!firebaseUser) {
+            return (
+                <div className="w-full flex flex-col items-center">
+                    {notices.length > 0 && (
+                        <div className="notice-wrap">
+                            {notices.map((n, idx) => (
+                                <div key={n.id} className={"notice " + (n.type || '') + (n.fading ? ' fading' : '') + (idx>0 && !n.fading ? ' white move-up' : '')}>{n.text}</div>
+                            ))}
+                        </div>
+                    )}
+                    <LoginScreen onLoginGoogle={handleLoginGoogle} onLoginGuest={handleLoginGuest} loading={loading} />
+                </div>
+            );
+        }
+
+        // 3. Welcome / Settings View (Authenticated but maybe no API Key)
+        if (view === 'welcome' && !userData.apiKey) {
+            return (
+                <div className="glass-card animate-fade-in text-center max-w-lg mt-10 relative">
+                     <button onClick={handleLogout} className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/30 rounded-full text-xs flex items-center gap-1">
+                        <LogOut size={14}/> Sign Out
+                    </button>
+                    <div className="p-6 rounded-full bg-white/10 inline-block mb-4 relative">
+                        <div className="app-title">FEXOR</div>
+                        <div className="glass-oval" aria-hidden></div>
+                    </div>
+                    <p className="mb-2 opacity-80">Where every click finds a flick</p>
+                    <div className="space-y-4 text-left mt-4">
+                        <div>
+                            <label className="text-sm font-bold ml-1">Username</label>
+                            <input type="text" className="w-full p-3 rounded-xl bg-white/50 border-none focus:ring-2 focus:ring-pink-400 outline-none contrast-text" value={userData.username} onChange={e => updateUserData({ username: e.target.value })} placeholder="กรอกชื่อ Username ของคุณ" />
+                        </div>
+                        <div>
+                            <label className="text-sm font-bold ml-1">Gemini API Key</label>
+                            <input type="password" className="w-full p-3 rounded-xl bg-white/50 border-none focus:ring-2 focus:ring-pink-400 outline-none contrast-text" value={userData.apiKey} onChange={e => updateUserData({ apiKey: e.target.value })} placeholder="วาง API Key ที่นี่..." />
+                        </div>
+                        <button onClick={() => {
+                            if (!userData.apiKey) {
+                                pushNotice(userData.lang === 'en' ? 'API key required' : 'ขอ Key ก่อนนะ!', 'warn');
+                                return;
+                            }
+                            setView('search');
+                        }} className="btn-primary w-full py-3 rounded-xl font-bold text-lg shadow-lg mt-4">{userData.lang === 'en' ? L10N.en.go_home : L10N.th.go_home} <ChevronRight className="inline"/></button>
+                        <div className="mt-3 text-left">
+                            <label className="inline-flex items-center gap-2"><input type="checkbox" checked={userData.saveUsage !== false} onChange={(e) => updateUserData({ saveUsage: !!e.target.checked })} /> <span className="text-sm">{userData.lang === 'en' ? L10N.en.save_usage_label : L10N.th.save_usage_label}</span></label>
+                        </div>
+                        <div className="text-center mt-4"><button onClick={() => setIsSettingsOpen(true)} className="text-sm opacity-70 hover:opacity-100 underline">{userData.lang === 'en' ? 'Restore / Settings' : 'กู้ข้อมูลเก่า / ตั้งค่า'}</button></div>
+                    </div>
+                    <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} userData={userData} updateUserData={updateUserData} onLogout={handleLogout} onFactoryReset={() => { localStorage.removeItem('jinny_movie_data_v6'); window.location.reload(); }} handleBackup={() => { const blob = new Blob([JSON.stringify(userData, null, 2)], { type: "application/json" }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `${userData.username || 'user'}_fexor_backup.json`; link.click(); pushNotice('Backup สร้างสำเร็จ'); }} onRestore={(e) => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (evt) => { try { updateUserData(JSON.parse(evt.target.result)); pushNotice('กู้คืนสำเร็จ'); setIsSettingsOpen(false); } catch(e) { pushNotice('ไฟล์เสียจ้ะ'); } }; reader.readAsText(file); }} />
+                </div>
+            );
+        }
+
+        const Header = () => (
+            <div className="w-full max-w-4xl mx-auto flex justify-between items-center mb-6 bg-black/20 app-header-compact rounded-2xl backdrop-blur-sm text-white p-3">
+                <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView('dashboard')}>
+                    <div className="bg-white/20 p-2 rounded-full">
+                        <div className="app-title text-sm">FEXOR</div>
+                    </div>
+                    <div className="hidden md:block">
+                        <h2 className="font-bold text-lg font-bai-jamjuree">หวัดดีจ้ะ {userData.username ? userData.username : ''}</h2>
+                        <p className="text-xs opacity-80">มาหาหนังกันเถอะ</p>
+                    </div>
+                </div>
+                <div className="flex gap-1 items-center">
+                    <button onClick={() => setView(prev => prev === 'search' ? 'dashboard' : 'search')} className={`p-2 rounded-full transition ${view === 'search' ? 'bg-white/20' : 'hover:bg-white/10'}`} title="ค้นหา"><Search size={18} /></button>
+                    <button onClick={() => setView(prev => prev === 'randomizer' ? 'dashboard' : 'randomizer')} className={`p-2 rounded-full transition ${view === 'randomizer' ? 'bg-white/20' : 'hover:bg-white/10'}`} title="สุ่มหนัง"><Dice size={18} /></button>
+                    <button onClick={() => setView(prev => prev === 'saved' ? 'dashboard' : 'saved')} className={`p-2 rounded-full transition ${view === 'saved' ? 'bg-white/20' : 'hover:bg-white/10'}`} title="รายการที่บันทึก"><Save size={18} /></button>
+                    <button onClick={() => setView(prev => prev === 'notFound' ? 'dashboard' : 'notFound')} className={`p-2 rounded-full transition ${view === 'notFound' ? 'bg-white/20' : 'hover:bg-white/10'}`} title="ที่ยังหาไม่เจอ"><FileQuestion size={18} /></button>
+                    <button onClick={() => setIsSettingsOpen(true)} className="p-2 hover:bg-white/10 rounded-full transition" title="ตั้งค่า"><Settings size={18} /></button>
+                </div>
+            </div>
+        );
+
+        // 4. Main App Views (Authenticated & Has API Key)
+        return (
+            <div className="w-full flex flex-col items-center">
+                {notices.length > 0 && (
+                    <div className="notice-wrap">
+                        {notices.map((n, idx) => (
+                            <div key={n.id} className={"notice " + (n.type || '') + (n.fading ? ' fading' : '') + (idx>0 && !n.fading ? ' white move-up' : '')}>{n.text}</div>
+                        ))}
+                    </div>
+                )}
+                <Header />
+                
+                {view === 'dashboard' && <Dashboard savedMovies={userData.savedMovies} limit={userData.dashboardLimit || 20} onStartSearch={() => setView('search')} username={userData.username} />}
+
+                {/* RANDOMIZER & SEARCH VIEWS */}
+                {(view === 'search' || view === 'randomizer') && (
+                    <div className="w-full max-w-4xl space-y-6 animate-fade-in">
+                        <div className="glass-card p-4">
+                            {view === 'randomizer' && (
+                                <div className="mb-6 border-b border-black/10 dark:border-white/10 pb-4">
+                                    <h3 className="text-xl font-bold mb-3 flex items-center gap-2"><Dice className="animate-bounce"/> วันนี้ดูอะไรดี?</h3>
+                                    <label className="block text-xs font-bold mb-2 opacity-70">เลือกช่องทางที่มี (Streaming)</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {STREAMING_PLATFORMS.map(p => (
+                                            <button key={p.id} 
+                                                onClick={() => setSelectedStreaming(prev => prev.includes(p.id) ? prev.filter(id => id !== p.id) : [...prev, p.id])}
+                                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition border-2 ${selectedStreaming.includes(p.id) ? `${p.color} border-white shadow-lg scale-105` : 'bg-white/40 border-transparent hover:bg-white/60'}`}>
+                                                {p.id}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {view === 'search' && (
+                                <div className="mb-6 border-b border-black/10 dark:border-white/10 pb-4">
+                                    <h3 className="text-xl font-bold mb-3 flex items-center gap-2"><Search size={18}/> เรื่องที่ตามหา FEXOR สืบให้</h3>
+                                    <label className="block text-xs font-bold mb-2 opacity-70">เลือกช่องทางที่มี (Streaming)</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {STREAMING_PLATFORMS.map(p => (
+                                            <button key={p.id} 
+                                                onClick={() => setSelectedStreaming(prev => prev.includes(p.id) ? prev.filter(id => id !== p.id) : [...prev, p.id])}
+                                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition border-2 ${selectedStreaming.includes(p.id) ? `${p.color} border-white shadow-lg scale-105` : 'bg-white/40 border-transparent hover:bg-white/60'}`}>
+                                                {p.id}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Main Filters */}
+                            <div className="flex flex-wrap gap-4 mb-4">
+                                <div className="flex-1 min-w-[150px]">
+                                    <label className="block text-xs font-bold mb-1 opacity-70"><Tv size={14} className="inline"/> ประเภทสื่อ</label>
+                                    <select value={selectedMediaType} onChange={e => setSelectedMediaType(e.target.value)} className="w-full p-2 rounded-lg bg-white/50 border-none text-sm outline-none contrast-text placeholder-current">
+                                        <option value="">ทั้งหมด</option>
+                                        {MEDIA_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                                    </select>
+                                </div>
+                                <div className="flex-1 min-w-[150px]">
+                                    <label className="block text-xs font-bold mb-1 opacity-70"><Globe size={14} className="inline"/> ประเทศ</label>
+                                    <select value={selectedCountry} onChange={e => setSelectedCountry(e.target.value)} className="w-full p-2 rounded-lg bg-white/50 border-none text-sm outline-none contrast-text placeholder-current">
+                                        {COUNTRIES.map(c => <option key={c} value={c === 'ไม่ระบุ' ? '' : c}>{c}</option>)}
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* New Filters: Audio & Year */}
+                            <div className="flex flex-wrap gap-4 mb-4 p-3 bg-white/30 rounded-xl">
+                                <div className="flex-1 min-w-[200px]">
+                                    <label className="block text-xs font-bold mb-2 opacity-70"><Mic size={14} className="inline"/> เสียง/ซับ (เลือกได้หลายอัน)</label>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => setSelectedAudio(prev => prev.includes('พากย์ไทย') ? prev.filter(a => a !== 'พากย์ไทย') : [...prev, 'พากย์ไทย'])}
+                                            className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-bold border transition ${selectedAudio.includes('พากย์ไทย') ? 'bg-blue-500 text-white border-blue-500' : 'bg-white/50 border-transparent hover:bg-white/80'}`}>
+                                            พากย์ไทย
+                                        </button>
+                                        <button onClick={() => setSelectedAudio(prev => prev.includes('ซับไทย') ? prev.filter(a => a !== 'ซับไทย') : [...prev, 'ซับไทย'])}
+                                            className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-bold border transition ${selectedAudio.includes('ซับไทย') ? 'bg-blue-500 text-white border-blue-500' : 'bg-white/50 border-transparent hover:bg-white/80'}`}>
+                                            ซับไทย
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="flex-1 min-w-[200px]">
+                                    <label className="block text-xs font-bold mb-2 opacity-70"><Calendar size={14} className="inline"/> ปีที่ฉาย (ค.ศ.)</label>
+                                    <div className="flex gap-2 items-center">
+                                        <input type="number" placeholder="2000" value={yearRange.start} onChange={e => setYearRange({...yearRange, start: e.target.value})} className="w-full p-1.5 rounded-lg bg-white/50 border-none text-xs text-center outline-none contrast-text placeholder-current" />
+                                        <span className="text-xs font-bold">-</span>
+                                        <input type="number" placeholder="2024" value={yearRange.end} onChange={e => setYearRange({...yearRange, end: e.target.value})} className="w-full p-1.5 rounded-lg bg-white/50 border-none text-xs text-center outline-none contrast-text placeholder-current" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold mb-2 opacity-70">แนวหนัง</label>
+                                <div className="flex flex-wrap gap-2">
+                                    {GENRES.map(g => (
+                                        <button key={g} onClick={() => { if (selectedGenres.includes(g)) setSelectedGenres(prev => prev.filter(i => i !== g)); else setSelectedGenres(prev => [...prev, g]); }}
+                                        className={`px-3 py-1 rounded-full text-xs transition-all border border-transparent ${selectedGenres.includes(g) ? 'bg-purple-600 text-white shadow-md' : 'bg-white/40 hover:bg-white/60'}`}>
+                                            {g}
+                                        </button>
+                                    ))}
+                                </div>
+                                {view === 'randomizer' && (
+                                    <div className="mt-3">
+                                        <label className="block text-sm font-bold mb-1">Prompt เพิ่มเติม</label>
+                                        <input value={randomPrompt} onChange={(e) => setRandomPrompt(e.target.value)} placeholder="ใส่คำสั่งค้นหาเพิ่มเติมสำหรับโหมดสุ่ม..." className="w-full p-2 rounded-lg bg-white/50 border-none contrast-text placeholder-current" />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {view === 'search' && (
+                            <>
+                                {searchHistory.length > 0 && (
+                                    <div className="bg-white/40 p-4 rounded-xl border border-white/20">
+                                        <h4 className="text-sm font-bold mb-2 opacity-80">ข้อมูลเดิม:</h4>
+                                        <ul className="list-disc list-inside text-sm space-y-1 opacity-90">{searchHistory.map((h, i) => <li key={i}>{h}</li>)}</ul>
+                                    </div>
+                                )}
+                                <div className="glass-card relative">
+                                    <textarea value={promptText} onChange={(e) => setPromptText(e.target.value)} placeholder="บอกมาเลยจ้ะ พระเอกเป็นไง? ฉากจำได้คืออะไร?..." className="w-full p-4 rounded-xl bg-white/60 border-none focus:ring-2 focus:ring-purple-400 h-28 resize-none outline-none text-lg contrast-text placeholder-current" onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); searchMovies(); } }}></textarea>
+                                    <div className="absolute bottom-3 right-3 flex gap-2">
+                                        {searchHistory.length > 0 && <button onClick={handleNewSearch} className="bg-red-500/80 text-white px-4 py-2 rounded-full hover:bg-red-600 transition text-sm font-bold">หาเรื่องใหม่</button>}
+                                        <button onClick={() => loading ? cancelSearch() : searchMovies()} disabled={!promptText && view === 'search'} className="btn-primary px-6 py-2 rounded-full disabled:opacity-50 flex items-center gap-2 font-bold">
+                                            {loading ? <><Film className="animate-spin-reel" size={18} /> กำลังค้นหา...</> : <><Search size={18} /> ค้นหา</>}
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="text-center">
+                                    <button onClick={() => { setPromptText(''); setSelectedGenres([]); setSelectedMediaType(''); setSelectedCountry(''); setSelectedStreaming([]); setSelectedAudio([]); setYearRange({start:'', end:''}); }} className="text-sm opacity-70 hover:opacity-100 underline">หาตอน/Episode แทน</button>
+                                </div>
+                            </>
+                        )}
+
+                        {view === 'randomizer' && (
+                            <div className="text-center space-y-3">
+                                <button onClick={() => loading ? cancelSearch() : searchMovies()} disabled={false} className="btn-primary px-12 py-4 rounded-full font-bold text-2xl shadow-xl hover:scale-105 transition active:scale-95 flex items-center gap-3 mx-auto">
+                                    {loading ? <><Dice className="animate-roll" size={32} /> กำลังค้นหา...</> : <><Dice size={32}/> สุ่มเลย!</>}
+                                </button>
+                                <div className="text-center">
+                                    <button onClick={() => { setPromptText(''); setSelectedGenres([]); setSelectedMediaType(''); setSelectedCountry(''); setSelectedStreaming([]); setSelectedAudio([]); setYearRange({start:'', end:''}); }} className="text-sm opacity-70 hover:opacity-100 underline">หาตอน/Episode แทน</button>
+                                </div>
+                            </div>
+                        )}
+
+                        {results.length > 0 && (
+                            <div className="glass-card animate-fade-in">
+                                <h3 className="text-xl font-bold mb-4 text-center font-bai-jamjuree">{view === 'randomizer' ? '✨ จัดให้ 3 เรื่องนี้จ้ะ!' : 'ใช่พวกนี้ไหมจ๊ะ? 👇'}</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    {results.map((movie, i) => (
+                                        <div key={i} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg flex flex-col hover:shadow-2xl transition-all">
+                                            <div className="h-56 bg-gray-200 relative group overflow-hidden">
+                                                <div className="w-full h-full cursor-pointer" onClick={() => openGoogleSearch(movie.title, movie.year)}><img src={movie.poster} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" /></div>
+                                                
+                                                {/* Streaming Badge */}
+                                                {movie.streaming && (
+                                                    <div className="absolute top-2 right-2 bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                                                        {movie.streaming}
+                                                    </div>
+                                                )}
+                                                
+                                                {/* Standard Search Overlay */}
+                                                {view === 'search' && (
+                                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                                                        <button onClick={(e) => { e.stopPropagation(); handleFoundIt(movie); }} className="bg-green-500 text-white px-4 py-2 rounded-full font-bold scale-90 hover:scale-105 transition shadow-lg flex items-center gap-2 pointer-events-auto"><Check size={18}/> ใช่เลย!</button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="p-4 flex-1 flex flex-col">
+                                                <div className="flex-1">
+                                                    <h4 className="font-bold text-gray-800 dark:text-white">{movie.title}</h4>
+                                                    <span className="text-xs text-purple-500 block mb-2">{movie.year}</span>
+                                                    <p className="text-sm text-gray-600 dark:text-gray-300">{movie.description}</p>
+                                                </div>
+                                                
+                                                {/* Randomizer Buttons */}
+                                                {view === 'randomizer' && (
+                                                    <div className="mt-4 flex flex-col gap-2">
+                                                        <button onClick={() => handleFoundIt(movie, true)} className="w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-2 shadow"><Heart size={16}/> เรื่องนี้แหละ (อยากดู)</button>
+                                                        <button onClick={() => handleIgnore(movie)} className="w-full bg-gray-200 hover:bg-gray-300 text-gray-600 py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-2"><Ban size={16}/> ไม่น่าดู</button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {view === 'saved' && (
+                    <div className="glass-card w-full max-w-4xl animate-fade-in min-h-[50vh]">
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                            <h2 className="text-2xl font-bold flex items-center gap-2"><Save /> {savedFilters.includes('ignored') ? 'รายการที่ไม่น่าดู' : 'รายการที่บันทึกไว้'}</h2>
+                            <div className="flex gap-2 flex-wrap justify-center">
+                                {[
+                                    { id: 'wishlist', label: 'อยากดู', icon: <Heart size={14}/>, color: 'bg-pink-500' },
+                                    { id: 'watched', label: 'ดูแล้ว', icon: <Eye size={14}/>, color: 'bg-green-500' },
+                                    { id: 'unwatched', label: 'ยังไม่ดู', icon: <EyeOff size={14}/>, color: 'bg-gray-500' },
+                                    { id: 'like', label: 'ชอบ', icon: <ThumbsUp size={14}/>, color: 'bg-blue-500' },
+                                    { id: 'dislike', label: 'ไม่ชอบ', icon: <ThumbsDown size={14}/>, color: 'bg-red-500' },
+                                    { id: 'ignored', label: 'ไม่น่าดู', icon: <Ban size={14}/>, color: 'bg-gray-700' },
+                                ].map(f => (
+                                    <button key={f.id} onClick={() => toggleSavedFilter(f.id)} className={`px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 transition border-2 border-transparent ${savedFilters.includes(f.id) ? `${f.color} text-white shadow-md scale-105` : 'bg-white/40 hover:bg-white/60'}`}>
+                                        {f.icon} {f.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        
+                        {/* Conditional Rendering for Ignored vs Saved */}
+                        {savedFilters.includes('ignored') ? (
+                            /* Ignored List View */
+                            userData.ignoredMovies && userData.ignoredMovies.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {userData.ignoredMovies.map((m) => (
+                                        <div key={m.id} className="bg-gray-200/80 p-4 rounded-xl flex gap-4 relative opacity-80 hover:opacity-100 transition">
+                                            <div className="w-20 h-28 shrink-0"><img src={m.poster} className="w-full h-full object-cover rounded-lg shadow-md bg-gray-300 grayscale" /></div>
+                                            <div className="flex-1">
+                                                <h4 className="font-bold text-lg leading-tight text-gray-700">{m.title}</h4>
+                                                <span className="text-xs bg-gray-300 text-gray-600 px-2 py-0.5 rounded-full">{m.year}</span>
+                                                <p className="text-xs mt-2 text-red-500 font-bold">ปัดทิ้งเมื่อ: {new Date(m.date).toLocaleDateString('th-TH')}</p>
+                                            </div>
+                                            <button onClick={() => showConfirm(userData.lang === 'en' ? 'Remove from ignored list? (you can restore later)' : 'ลบออกจากรายการไม่น่าดู? (เผื่อจะกลับมาสุ่มเจอใหม่)', () => handleRemoveIgnored(m.id), userData.lang === 'en' ? 'Confirm' : 'ยืนยัน')} className="absolute top-2 right-2 p-2 text-gray-400 hover:text-red-600 bg-white rounded-full shadow-sm"><Trash2 size={16}/></button>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : <p className="text-center opacity-50 py-10">ไม่มีหนังที่ไม่น่าดูจ้ะ</p>
+                        ) : (
+                            /* Standard Saved List View */
+                            userData.savedMovies.length === 0 ? <p className="text-center opacity-50 py-10">ยังไม่มีหนังที่บันทึกไว้เลยจ้ะ</p> : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {userData.savedMovies.filter(m => {
+                                        if (savedFilters.length === 0) return true;
+                                        let matches = false;
+                                        if (savedFilters.includes('wishlist') && m.isWishlist) matches = true;
+                                        if (savedFilters.includes('watched') && m.watched) matches = true;
+                                        if (savedFilters.includes('unwatched') && !m.watched && !m.isWishlist) matches = true;
+                                        if (savedFilters.includes('like') && m.rating === 'like') matches = true;
+                                        if (savedFilters.includes('dislike') && m.rating === 'dislike') matches = true;
+                                        return matches;
+                                    }).map((m) => (
+                                        <div key={m.id} className="bg-white/50 p-4 rounded-xl relative group hover:bg-white/70 transition">
+                                            <div className="flex gap-4 mb-3">
+                                                <div className="w-20 h-28 shrink-0 cursor-pointer relative hover:opacity-80 transition group" onClick={() => openGoogleSearch(m.title, m.year)} title="ค้นหาใน Google">
+                                                    <img src={m.poster} className="w-full h-full object-cover rounded-lg shadow-md bg-gray-300" />
+                                                    {/* Status Badge on Poster Right Side (bottom-right corner) */}
+                                                    <div className="absolute -right-1 bottom-0 flex flex-col items-end gap-1">
+                                                        {m.streaming && <span className="text-[9px] bg-purple-600 text-white px-2 py-0.5 rounded-l font-bold">{m.streaming}</span>}
+                                                        {m.isWishlist && <span className="text-[9px] bg-pink-500 text-white px-2 py-0.5 rounded-l font-bold">อยากดู</span>}
+                                                        {m.watched && <span className="text-[9px] bg-green-500 text-white px-2 py-0.5 rounded-l font-bold">ดูแล้ว</span>}
+                                                    </div>
+                                                </div>
+                                                <div className="flex-1">
+                                                    <h4 className="font-bold text-lg leading-tight">{m.title}</h4>
+                                                    <span className="text-xs bg-purple-200 text-purple-800 px-2 py-0.5 rounded-full">{m.year}</span>
+                                                </div>
+                                                <button onClick={() => showConfirm(userData.lang === 'en' ? 'Delete this movie from saved list?' : 'ลบจริงดิ?', () => updateUserData({ savedMovies: userData.savedMovies.filter(x => x.id !== m.id) }), userData.lang === 'en' ? 'Delete' : 'ลบ')} className="p-2 text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition"><Trash2 size={16}/></button>
+                                            </div>
+                                            <div className="flex flex-wrap gap-2 items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <button onClick={() => toggleWatched(m.id)} className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 transition ${m.watched ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'}`}>{m.watched ? <Eye size={14}/> : <EyeOff size={14}/>} {m.watched ? 'ดูแล้ว' : 'ยังไม่ได้ดู'}</button>
+                                                    {m.watched && (
+                                                        <div className="flex gap-1 bg-white/50 rounded-full p-1">
+                                                            <button onClick={() => rateMovie(m.id, 'like')} className={`p-1 rounded-full hover:bg-green-100 ${m.rating === 'like' ? 'text-green-600' : 'text-gray-400'}`}><ThumbsUp size={16}/></button>
+                                                            <button onClick={() => rateMovie(m.id, 'dislike')} className={`p-1 rounded-full hover:bg-red-100 ${m.rating === 'dislike' ? 'text-red-600' : 'text-gray-400'}`}><ThumbsDown size={16}/></button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )
+                        )}
+                    </div>
+                )}
+
+                <ConfirmModal isOpen={confirmState.open} message={confirmState.message} title={confirmState.title} onClose={() => setConfirmState(prev => ({ ...prev, open: false }))} onConfirm={() => { if (confirmState.onConfirm) confirmState.onConfirm(); }} />
+                <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} userData={userData} updateUserData={updateUserData} onLogout={handleLogout} onFactoryReset={() => { localStorage.removeItem('jinny_movie_data_v6'); window.location.reload(); }} handleBackup={() => { const blob = new Blob([JSON.stringify(userData, null, 2)], { type: "application/json" }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `${userData.username || 'user'}_fexor_backup.json`; link.click(); pushNotice('Backup สร้างสำเร็จ'); }} onRestore={(e) => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (evt) => { try { updateUserData(JSON.parse(evt.target.result)); pushNotice('กู้คืนสำเร็จ'); setIsSettingsOpen(false); } catch(e) { pushNotice('ไฟล์เสียจ้ะ'); } }; reader.readAsText(file); }} />
+                <div className="text-xs opacity-40 mt-8 pb-4">Made with 💖 by XPENTA7</div>
+            </div>
+        );
+    };
+
+    const Check = (props) => <IconBase {...props}><polyline points="20 6 9 17 4 12"/></IconBase>;
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+</script>
+
+</body>
+</html>
